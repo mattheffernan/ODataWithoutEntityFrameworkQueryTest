@@ -1,93 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
+using System.Web.OData;
 using ODataWithoutEntityFrameworkQueryTest.Models;
 
 namespace ODataWithoutEntityFrameworkQueryTest.Controllers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Web.Http;
-    using System.Web.OData;
+    /*
+        * Filters: http://localhost:32203/Books&$filter=Press/Address/City eq 'Redmond'
+        * Select: http://localhost:32203/Books?$select=Press/Name
+        */
 
-    namespace MyApp.Controllers
+    public class BooksController : ODataController
     {
-        /*
-         * Filters: http://localhost:32203/Books&$filter=Press/Address/City eq 'Redmond'
-         * Select: http://localhost:32203/Books?$select=Press/Name
-         */
-
-        public class BooksController : ODataController
+        private IList<Book> _books = new List<Book>
+    {
+        new Book
         {
-            private IList<Book> _books = new List<Book>
-        {
-            new Book
+            ISBN = "978-0-7356-8383-9",
+            Title = "SignalR Programming in Microsoft ASP.NET",
+            Press = new Press
             {
-                ISBN = "978-0-7356-8383-9",
-                Title = "SignalR Programming in Microsoft ASP.NET",
-                Press = new Press
+                Name = "Microsoft Press",
+                Category = Category.Book
+            }
+        },
+
+        new Book
+        {
+            ISBN = "978-0-7356-7942-9",
+            Title = "Microsoft Azure SQL Database Step by Step",
+            Press = new Press
+            {
+                Name = "Microsoft Press",
+                Category = Category.EBook,
+                DynamicProperties = new Dictionary<string, object>
                 {
-                    Name = "Microsoft Press",
-                    Category = Category.Book
+                    { "Blog", "http://blogs.msdn.com/b/microsoft_press/" },
+                    { "Address", new Address {
+                            City = "Redmond", Street = "One Microsoft Way" }
+                    }
                 }
             },
-
-            new Book
+            Properties = new Dictionary<string, object>
             {
-                ISBN = "978-0-7356-7942-9",
-                Title = "Microsoft Azure SQL Database Step by Step",
-                Press = new Press
-                {
-                    Name = "Microsoft Press",
-                    Category = Category.EBook,
-                    DynamicProperties = new Dictionary<string, object>
-                    {
-                        { "Blog", "http://blogs.msdn.com/b/microsoft_press/" },
-                        { "Address", new Address {
-                              City = "Redmond", Street = "One Microsoft Way" }
-                        }
-                    }
-                },
-                Properties = new Dictionary<string, object>
-                {
-                    { "Published", new DateTimeOffset(2014, 7, 3, 0, 0, 0, 0, new TimeSpan(0))},
-                    { "Authors", new [] { "Leonard G. Lobel", "Eric D. Boyd" }},
-                    { "OtherCategories", new [] {Category.Book, Category.Magazine}}
-                }
+                { "Published", new DateTimeOffset(2014, 7, 3, 0, 0, 0, 0, new TimeSpan(0))},
+                { "Authors", new [] { "Leonard G. Lobel", "Eric D. Boyd" }},
+                { "OtherCategories", new [] {Category.Book, Category.Magazine}}
             }
-        };
+        }
+    };
 
-            [EnableQuery]
-            public IQueryable<Book> Get()
+        [EnableQuery]
+        public IQueryable<Book> Get()
+        {
+            return _books.AsQueryable();
+        }
+
+        public IHttpActionResult Get([FromODataUri]string key)
+        {
+            Book book = _books.FirstOrDefault(e => e.ISBN == key);
+            if (book == null)
             {
-                return _books.AsQueryable();
+                return NotFound();
             }
 
-            public IHttpActionResult Get([FromODataUri]string key)
-            {
-                Book book = _books.FirstOrDefault(e => e.ISBN == key);
-                if (book == null)
-                {
-                    return NotFound();
-                }
+            return Ok(book);
+        }
 
-                return Ok(book);
-            }
-
-            public IHttpActionResult Post(Book book)
+        public IHttpActionResult Post(Book book)
+        {
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-                // For this sample, we aren't enforcing unique keys.
-                _books.Add(book);
-                return Created(book);
+                return BadRequest(ModelState);
             }
+            // For this sample, we aren't enforcing unique keys.
+            _books.Add(book);
+            return Created(book);
         }
     }
 }
