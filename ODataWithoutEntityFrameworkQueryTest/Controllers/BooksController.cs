@@ -10,6 +10,7 @@ namespace ODataWithoutEntityFrameworkQueryTest.Controllers
     /*
         * Filters: http://localhost:32203/Books?$filter=Press/Address/City eq 'Redmond'
         * Select: http://localhost:32203/Books?$select=Press/Name
+        * Abstract Filter: http://localhost:32203/Books?$filter=BookType/Language%20eq%20%27SQL%27
         */
 
     public class BooksController : ODataController
@@ -24,6 +25,10 @@ namespace ODataWithoutEntityFrameworkQueryTest.Controllers
             {
                 Name = "Microsoft Press",
                 Category = Category.Book
+            },
+            BookType = new Programming()
+            {
+                Language = "C#"
             }
         },
 
@@ -48,6 +53,10 @@ namespace ODataWithoutEntityFrameworkQueryTest.Controllers
                 { "Published", new DateTimeOffset(2014, 7, 3, 0, 0, 0, 0, new TimeSpan(0))},
                 { "Authors", new [] { "Leonard G. Lobel", "Eric D. Boyd" }},
                 { "OtherCategories", new [] {Category.Book, Category.Magazine}}
+            },
+            BookType = new Programming()
+            {
+                Language = "SQL"
             }
         }
     };

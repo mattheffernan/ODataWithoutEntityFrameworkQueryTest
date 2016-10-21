@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.UI;
 
 namespace ODataWithoutEntityFrameworkQueryTest.Models
 {
@@ -40,6 +41,18 @@ namespace ODataWithoutEntityFrameworkQueryTest.Models
         public string ISBN { get; set; }
         public string Title { get; set; }
         public Press Press { get; set; }
+        public BookType BookType { get; set; }
         public IDictionary<string, object> Properties { get; set; }
     }
+
+    public abstract class BookType
+    {
+        
+    }
+
+    public class Programming : BookType
+    {
+        public string Language { get; set; }
+    }
+
 }
