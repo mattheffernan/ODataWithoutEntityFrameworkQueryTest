@@ -8,7 +8,7 @@ using ODataWithoutEntityFrameworkQueryTest.Models;
 namespace ODataWithoutEntityFrameworkQueryTest.Controllers
 {
     /*
-        * Filters: http://localhost:32203/Books&$filter=Press/Address/City eq 'Redmond'
+        * Filters: http://localhost:32203/Books?$filter=Press/Address/City eq 'Redmond'
         * Select: http://localhost:32203/Books?$select=Press/Name
         */
 
