@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http;
+using System.Web.OData.Builder;
+using System.Web.OData.Extensions;
+using ODataWithoutEntityFrameworkQueryTest.Models;
 
 namespace ODataWithoutEntityFrameworkQueryTest
 {
@@ -9,16 +12,18 @@ namespace ODataWithoutEntityFrameworkQueryTest
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
+            ODataConventionModelBuilder builder = new ODataConventionModelBuilder();
+            builder.EntitySet<Book>("Books");
+            builder.EntitySet<Customer>("Customers");
+            var model = builder.GetEdmModel();
 
-            // Web API routes
-            config.MapHttpAttributeRoutes();
+            config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
 
-            config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            config.MapODataServiceRoute(
+                routeName: "ODataRoute",
+                routePrefix: null,
+                model: model);
+
         }
     }
 }
